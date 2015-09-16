@@ -1,0 +1,46 @@
+#!/bin/bash
+#This Script was written by Ossama Samir Ahmed 
+#This Script tends to create an an enviroment for writting C programs
+#Date: 17th october 2014
+if [[ $# == 0 ]];then
+	echo "Project name is missing. Type in: NewProject project_name"
+	exit 0
+elif [[ $#>1 ]]; then
+ 	echo "One argumnent is expected. Type in: NewProject project_name"
+	exit 0
+fi
+# creating subdirectories
+mkdir $1
+mkdir $1/backup
+mkdir $1/docs
+mkdir $1/archive
+mkdir $1/source
+#creating a compile file 
+> $1/source/compile
+chmod +x $1/source/compile
+#-----------------------------------
+#Start generating the compile script
+#-----------------------------------
+cat << EOF > $1/source/compile
+#!/bin/bash
+#Error conditions
+if [[ \$# == 0 ]];then
+	echo "You are missing file names. Type in: compile -o executable file(s) or compile files(s)"
+	exit 0
+elif [[ \$1 == "-o" && \$# < 3 ]];then 
+	echo "You are missing file names. Type in: compile -o executable file(s) or compile files(s)"
+	exit 0
+fi
+cd ..
+tar -cf ./archive/backup_\`date +%d\`_\`date +%m\`_\`date +%y\`.tar ./backup
+cd "source"
+cp -f * ../backup
+#compiling the files
+if [[ \$1 == "-o" ]];then
+   gcc -o \$2 \${@:3:\$#} 2> ../errors.txt
+else
+   gcc \${@:1:\$#} 2> ../errors.txt
+fi
+more ../errors.txt
+EOF
+exit 0
